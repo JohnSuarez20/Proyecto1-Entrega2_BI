@@ -70,7 +70,7 @@
     <script>
         // Función para enviar la predicción
         async function sendPrediction() {
-            const textos = document.getElementById('text-input').value.split(','); // Convertir los textos en una lista
+            const textos = document.getElementById('text-input').value.split(';'); // Convertir los textos en una lista
             const url = 'http://127.0.0.1:8000/prediccion/'; // URL de tu API
             
             const data = {
@@ -102,7 +102,7 @@
 
         // Función para enviar el reentrenamiento
         async function retrainModel() {
-            const textos = document.getElementById('retrain-texts').value.split(','); // Convertir los textos en una lista
+            const textos = document.getElementById('retrain-texts').value.split(';'); // Convertir los textos en una lista
             const etiquetas = document.getElementById('retrain-labels').value.split(','); // Convertir las etiquetas en una lista
             const url = 'http://127.0.0.1:8000/reentrenamiento/'; // URL de tu API
 
@@ -125,9 +125,13 @@
                     throw new Error(`Error: ${response.status}`);
                 }
 
-                // Mostrar los resultados del reentrenamiento
+                // Mostrar los resultados del reentrenamiento (precision, recall, f1_score)
                 const result = await response.json();
-                document.getElementById('retrain-result').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('retrain-result').textContent = `
+                    Precisión: ${result.precision}\n
+                    Recall: ${result.recall}\n
+                    F1-Score: ${result.f1_score}
+                `;
             } catch (error) {
                 console.error('Error en el reentrenamiento:', error);
                 document.getElementById('retrain-result').textContent = `Error: ${error.message}`;
