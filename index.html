@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción y Reentrenamiento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Aplicación de Predicción y Reentrenamiento</h1>
+
+    <!-- Sección de predicción -->
+    <div class="section">
+        <h2>Predicción de Textos</h2>
+        <p>Introduce uno o más textos separados por comas para predecir:</p>
+        <textarea id="text-input" placeholder="Escribe aquí tus textos..."></textarea>
+        <button onclick="sendPrediction()">Enviar para Predicción</button>
+        
+        <div class="result">
+            <h2>Resultado de la Predicción:</h2>
+            <pre id="prediction-result"></pre>
+        </div>
+    </div>
+
+    <!-- Sección de reentrenamiento -->
+    <div class="section">
+        <h2>Reentrenamiento del Modelo</h2>
+        <p>Introduce uno o más textos y las etiquetas correspondientes separados por comas:</p>
+        <textarea id="retrain-texts" placeholder="Escribe aquí tus textos para reentrenar..."></textarea>
+        <textarea id="retrain-labels" placeholder="Escribe aquí las etiquetas correspondientes..."></textarea>
+        <button onclick="retrainModel()">Enviar para Reentrenamiento</button>
+        
+        <div class="result">
+            <h2>Resultado del Reentrenamiento:</h2>
+            <pre id="retrain-result"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Función para enviar la predicción
+        async function sendPrediction() {
+            const textos = document.getElementById('text-input').value.split(','); // Convertir los textos en una lista
+            const url = 'http://127.0.0.1:8000/prediccion/'; // URL de tu API
+            
+            const data = {
+                textos: textos
+            };
+
+            try {
+                // Enviar la solicitud a la API
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+
+                // Mostrar los resultados de la predicción
+                const result = await response.json();
+                document.getElementById('prediction-result').textContent = JSON.stringify(result.predicciones, null, 2);
+            } catch (error) {
+                console.error('Error en la predicción:', error);
+                document.getElementById('prediction-result').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Función para enviar el reentrenamiento
+        async function retrainModel() {
+            const textos = document.getElementById('retrain-texts').value.split(','); // Convertir los textos en una lista
+            const etiquetas = document.getElementById('retrain-labels').value.split(','); // Convertir las etiquetas en una lista
+            const url = 'http://127.0.0.1:8000/reentrenamiento/'; // URL de tu API
+
+            const data = {
+                textos: textos,
+                etiquetas: etiquetas
+            };
+
+            try {
+                // Enviar la solicitud de reentrenamiento a la API
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+
+                // Mostrar los resultados del reentrenamiento
+                const result = await response.json();
+                document.getElementById('retrain-result').textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                console.error('Error en el reentrenamiento:', error);
+                document.getElementById('retrain-result').textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

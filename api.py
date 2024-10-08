@@ -6,6 +6,7 @@ from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 
@@ -48,6 +49,15 @@ modelo_entrenado = joblib.load('models/modelo_analitico.pkl')
 # API con FastAPI
 app = FastAPI()
 
+# Añadir el middleware CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permitir todos los orígenes (puedes especificar dominios en producción)
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permitir todos los headers
+)
+
 # Esquemas de entrada
 class DatosPrediccion(BaseModel):
     textos: list
@@ -79,4 +89,5 @@ def reentrenar(datos: DatosReentrenamiento):
 if __name__ == "__main__":
     uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
 
+#pip install fastapi[all]
 #uvicorn api:app --reload
