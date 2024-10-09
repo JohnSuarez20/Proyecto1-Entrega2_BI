@@ -166,7 +166,7 @@ async def reentrenar(file: UploadFile = File(...)):
         # Se carga el archivo CSV
         df = pd.read_csv(file.file, sep=',', encoding = "ISO-8859-1")
         textos = df['Textos_espanol'].tolist()
-        etiquetas = df['etiquetas'].tolist()
+        etiquetas = df['sdg'].tolist()
 
         # Se preprocesan los textos antes de reentrenar
         textos_preprocesados = preprocess_texts(textos)

@@ -101,7 +101,7 @@
     <!-- Sección de reentrenamiento -->
     <div class="section">
         <h2>Reentrenamiento del Modelo</h2>
-        <p>Sube un archivo CSV con los nuevos datos para reentrenar el modelo (los textos para entrenar deben estar estructurados dentro de una columna nombrada como "Textos_espanol" y sus etiquetas correspondientes dentro de la columna nombrada "etiquetas"):</p>
+        <p>Sube un archivo CSV con los nuevos datos para reentrenar el modelo (los textos para entrenar deben estar estructurados dentro de una columna nombrada como "Textos_espanol" y sus etiquetas correspondientes dentro de la columna nombrada "sdg"):</p>
         <input type="file" id="retrain-file" accept=".csv" />
         <button onclick="retrainModel()">Enviar para Reentrenamiento</button>
         
@@ -118,7 +118,7 @@
     </div>
 
     <script>
-        // Función para enviar la predicción con un archivo Excel
+        // Función para enviar la predicción con un archivo CSV
         async function sendPrediction() {
             const fileInput = document.getElementById('pred-file');
             const file = fileInput.files[0]; 
