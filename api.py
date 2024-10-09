@@ -149,6 +149,8 @@ if __name__ == "__main__":
     uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
 
 
+#COMANDOS PARA EJECUTAR EL PROYECTO
+
 #Comandos para ejecutar el entorno virtual
 #python -m venv env
 #env\Scripts\activate
