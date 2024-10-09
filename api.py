@@ -8,8 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, File, UploadFile
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from nltk.stem import PorterStemmer
@@ -86,54 +85,58 @@ def normalize_corpus(texts):
 
 # Función para preprocesar los textos
 def preprocess_texts(texts):
-    # Primero reemplazar caracteres especiales
+    # Se reemplazan los caracteres especiales
     textos_reemplazados = replace_special_chars(texts)
-    # Luego aplicar normalización y demás procesamiento
+    # Seaplica normalización y demás procesamiento a los datos
     textos_normalizados = normalize_corpus(textos_reemplazados)
     return textos_normalizados
 
-# Cargar el modelo entrenado
+# Se carga el modelo entrenado
 modelo_entrenado = joblib.load('models/modelo_analitico.pkl')
 
-# Esquemas de entrada
-class DatosPrediccion(BaseModel):
-    textos: list
-
-class DatosReentrenamiento(BaseModel):
-    textos: list
-    etiquetas: list
-
-# Endpoint de predicción
+# Endpoint de predicción con cargue de archivo Excel
 @app.post("/prediccion/")
-def predecir(datos: DatosPrediccion):
+async def predecir(file: UploadFile = File(...)):
     try:
-        # Preprocesar los textos antes de predecir
-        textos_preprocesados = preprocess_texts(datos.textos)
+        # Se carga el archivo Excel
+        df = pd.read_excel(file.file)
 
-        # Realizar la predicción con el modelo
+        textos = df['Textos_espanol'].tolist()
+
+        # Se preprocesan los textos antes de predecir
+        textos_preprocesados = preprocess_texts(textos)
+
+        # Se realiza la predicción con el modelo
         predicciones = modelo_entrenado.predict(textos_preprocesados)
         return {"predicciones": predicciones.tolist()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Endpoint de reentrenamiento
+# Endpoint de reentrenamiento con cargue de archivo Excel
 @app.post("/reentrenamiento/")
-def reentrenar(datos: DatosReentrenamiento):
+async def reentrenar(file: UploadFile = File(...)):
     try:
-        # Preprocesar los textos antes de reentrenar
-        textos_preprocesados = preprocess_texts(datos.textos)
+        # Se carga el archivo Excel
+        df = pd.read_excel(file.file)
+        textos = df['Textos_espanol'].tolist()
+        etiquetas = df['etiquetas'].tolist()
 
-        # Reentrenar el modelo
-        modelo_entrenado.fit(textos_preprocesados, datos.etiquetas)
+        # Se preprocesan los textos antes de reentrenar
+        textos_preprocesados = preprocess_texts(textos)
+
+        # Se reentrena el modelo
+        modelo_entrenado.fit(textos_preprocesados, etiquetas)
         joblib.dump(modelo_entrenado, 'models/modelo_analitico.pkl')
 
-        # Realizar predicciones para calcular las métricas
+        # Se realizan las predicciones para calcular las métricas
         y_pred = modelo_entrenado.predict(textos_preprocesados)
-        precision = precision_score(datos.etiquetas, y_pred, average='weighted')
-        recall = recall_score(datos.etiquetas, y_pred, average='weighted')
-        f1 = f1_score(datos.etiquetas, y_pred, average='weighted')
+        exactitud = accuracy_score(etiquetas, y_pred)
+        precision = precision_score(etiquetas, y_pred, average='weighted')
+        recall = recall_score(etiquetas, y_pred, average='weighted')
+        f1 = f1_score(etiquetas, y_pred, average='weighted')
 
         return {
+            "exactitud": exactitud,
             "precision": precision,
             "recall": recall,
             "f1_score": f1
@@ -141,10 +144,25 @@ def reentrenar(datos: DatosReentrenamiento):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Ejecutar la API con Uvicorn
+# Se ejecuta la api
 if __name__ == "__main__":
     uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
 
+
+#Comandos para ejecutar el entorno virtual
+#python -m venv env
+#env\Scripts\activate
+
+# Comandos para instalar las librerías necesarias
+#pip install uvicorn
 #pip install nltk
 #pip install fastapi[all]
+#pip install python-multipart
+#pip install pandas
+#pip install joblib
+#pip install scikit-learn
+#pip install openpyxl
+#pip install numpy
+
+# Comandos para ejecutar la API
 #uvicorn api:app --reload
