@@ -150,7 +150,7 @@
 
                 result.resultado.forEach((pred, index) => {
                     const listItem = document.createElement('li');
-                    listItem.innerHTML = `<strong>Texto ${index + 1}:</strong> sdg/ODS ${pred.prediccion} (Probabilidad de predicción: ${pred.probabilidad.toFixed(4)})`;
+                    listItem.innerHTML = `<strong>Texto ${index + 1}:</strong> sdg/ODS ${pred.prediccion} (Probabilidad de la predicción: ${pred.probabilidad.toFixed(4)})`;
                     predictionList.appendChild(listItem);  // Se añade cada predicción a la lista
                 });
 
