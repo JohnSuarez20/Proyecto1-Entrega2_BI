@@ -86,8 +86,8 @@
     <!-- Sección de predicción -->
     <div class="section">
         <h2>Predicción de Textos</h2>
-        <p>Sube un archivo Excel con los textos para realizar la predicción (los textos a predecir deben estar estructurados dentro de una columna nombrada como "Textos_espanol"):</p>
-        <input type="file" id="pred-file" accept=".xlsx" />
+        <p>Sube un archivo CSV con los textos para realizar la predicción (los textos a predecir deben estar estructurados dentro de una columna nombrada como "Textos_espanol"):</p>
+        <input type="file" id="pred-file" accept=".csv" />
         <button onclick="sendPrediction()">Enviar para Predicción</button>
         
         <div class="result">
@@ -98,19 +98,18 @@
         </div>
     </div>
 
-  
     <!-- Sección de reentrenamiento -->
     <div class="section">
         <h2>Reentrenamiento del Modelo</h2>
-        <p>Sube un archivo Excel con los nuevos datos para reentrenar el modelo (los textos para entrenar deben estar estructurados dentro de una columna nombrada como "Textos_espanol" y sus etiquetas correspondientes dentro de la columna nombrada "etiquetas"):</p>
-        <input type="file" id="retrain-file" accept=".xlsx" />
+        <p>Sube un archivo CSV con los nuevos datos para reentrenar el modelo (los textos para entrenar deben estar estructurados dentro de una columna nombrada como "Textos_espanol" y sus etiquetas correspondientes dentro de la columna nombrada "etiquetas"):</p>
+        <input type="file" id="retrain-file" accept=".csv" />
         <button onclick="retrainModel()">Enviar para Reentrenamiento</button>
         
         <div class="result">
             <h2>Resultado del Reentrenamiento:</h2>
             <div class="metrics">
-                <p class="metric-title">Score Modelo Re-entrenado:</p>
-                <p>Exactitud:<span id="exactitud"></span></p>
+                <p class="metric-title">Score del Modelo Re-entrenado:</p>
+                <p>Exactitud: <span id="exactitud"></span></p>
                 <p>Precisión: <span id="precision"></span></p>
                 <p>Recall: <span id="recall"></span></p>
                 <p>F1-Score: <span id="f1score"></span></p>
@@ -119,8 +118,8 @@
     </div>
 
     <script>
-         // Función para enviar la predicción con un archivo Excel
-         async function sendPrediction() {
+        // Función para enviar la predicción con un archivo Excel
+        async function sendPrediction() {
             const fileInput = document.getElementById('pred-file');
             const file = fileInput.files[0]; 
 
@@ -134,7 +133,7 @@
             formData.append('file', file); 
 
             try {
-                // Se envia el archivo a la API
+                // Se envía el archivo a la API
                 const response = await fetch(url, {
                     method: 'POST',
                     body: formData  
@@ -149,10 +148,10 @@
                 const predictionList = document.getElementById('prediction-result');
                 predictionList.innerHTML = '';  
 
-                result.predicciones.forEach((pred, index) => {
+                result.resultado.forEach((pred, index) => {
                     const listItem = document.createElement('li');
-                    listItem.innerHTML = `<strong>Texto ${index + 1}:</strong> sdg/ODS ${pred}`;
-                    predictionList.appendChild(listItem);  // Añadir cada predicción a la lista
+                    listItem.innerHTML = `<strong>Texto ${index + 1}:</strong> sdg/ODS ${pred.prediccion} (Probabilidad de predicción: ${pred.probabilidad.toFixed(4)})`;
+                    predictionList.appendChild(listItem);  // Se añade cada predicción a la lista
                 });
 
             } catch (error) {

@@ -31,6 +31,45 @@ stop_words = nltk.corpus.stopwords.words('spanish')
 wpt = nltk.WordPunctTokenizer()
 ps = PorterStemmer()
 
+#Se carga el archivo de datos utilizado en la Etapa1
+file_path = r"data\ODScat_345.xlsx"  
+try:
+    data_t = pd.read_excel(file_path, engine='openpyxl')
+except:
+    data_t = pd.read_excel(file_path, engine='xlrd') 
+
+#Se adapta la función replace_special_chars para los datos utilizados en la Etapa1
+def replace_special_chars(df):
+    replacements = {
+        'Ã¡': 'á', 'Ã©': 'é', 'Ã­': 'í', 'Ã³': 'ó', 'Ãº': 'ú',
+        'Ã': 'Á', 'Ã': 'É', 'Ã': 'Í', 'Ã': 'Ó', 'Ã': 'Ú',
+        'Ã±': 'ñ', 'Ã': 'Ñ', 'Ã¼': 'ü', 'Ã': 'Ü'
+    }
+    for col in df.select_dtypes(include=['object']).columns:
+        for old, new in replacements.items():
+            df[col] = df[col].str.replace(old, new)
+    return df
+
+# Se aplica la función a los datos cargados
+data_t = replace_special_chars(data_t)
+
+# Se devide el conjunto de datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(data_t['Textos_espanol'], data_t['sdg'], test_size=0.2, random_state=42)
+
+# Se crea el pipeline para automatizar el proceso
+pipeline = Pipeline([
+    ('tfidf', TfidfVectorizer(max_features=5000)),  # Vectorización con TF-IDF
+    ('svm', SVC(kernel='rbf', gamma='scale', C=1, probability=True))  # Clasificador SVM
+])
+
+# Se entrena el pipeline
+pipeline.fit(X_train, y_train)
+
+# Se guarda el pipeline completo (preprocesamiento + modelo entrenado)
+joblib.dump(pipeline, 'models/modelo_analitico.pkl')
+
+
+
 # Se adapta la función replace_special_chars para listas de textos
 def replace_special_chars(texts):
     replacements = {
@@ -93,12 +132,12 @@ def preprocess_texts(texts):
 # Se carga el modelo entrenado
 modelo_entrenado = joblib.load('models/modelo_analitico.pkl')
 
-# Endpoint de predicción con cargue de archivo Excel
+# Endpoint de predicción con cargue de archivo CSV
 @app.post("/prediccion/")
 async def predecir(file: UploadFile = File(...)):
     try:
-        # Se carga el archivo Excel
-        df = pd.read_excel(file.file)
+        # Car el archivo CSV
+        df = pd.read_csv(file.file, sep=',', encoding = "ISO-8859-1")
 
         textos = df['Textos_espanol'].tolist()
 
@@ -107,16 +146,25 @@ async def predecir(file: UploadFile = File(...)):
 
         # Se realiza la predicción con el modelo
         predicciones = modelo_entrenado.predict(textos_preprocesados)
-        return {"predicciones": predicciones.tolist()}
+        probabilidades = modelo_entrenado.predict_proba(textos_preprocesados)
+        
+        resultado = []
+        for i in range(len(predicciones)):
+            resultado.append({
+                "prediccion": int(predicciones[i]),  
+                "probabilidad": float(max(probabilidades[i])) 
+            })
+
+        return {"resultado": resultado}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Endpoint de reentrenamiento con cargue de archivo Excel
+# Endpoint de reentrenamiento con cargue de archivo CSV
 @app.post("/reentrenamiento/")
 async def reentrenar(file: UploadFile = File(...)):
     try:
-        # Se carga el archivo Excel
-        df = pd.read_excel(file.file)
+        # Se carga el archivo CSV
+        df = pd.read_csv(file.file, sep=',', encoding = "ISO-8859-1")
         textos = df['Textos_espanol'].tolist()
         etiquetas = df['etiquetas'].tolist()
 
