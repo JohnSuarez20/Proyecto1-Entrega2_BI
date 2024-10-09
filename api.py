@@ -13,7 +13,7 @@ import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from nltk.stem import PorterStemmer
 
-# Inicializar FastAPI
+# Se inicializa FastAPI
 app = FastAPI()
 
 # Configuración de CORS
@@ -25,15 +25,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Cargar los stopwords y otros recursos de NLTK
+# Se cargan los stopwords y otros recursos de NLTK
 nltk.download('stopwords')
 stop_words = nltk.corpus.stopwords.words('spanish')
 wpt = nltk.WordPunctTokenizer()
 ps = PorterStemmer()
 
-# Adaptar la función replace_special_chars para listas de textos
+# Se adapta la función replace_special_chars para listas de textos
 def replace_special_chars(texts):
-    # Diccionario de reemplazo
     replacements = {
         'Ã¡': 'á', 'Ã©': 'é', 'Ã­': 'í', 'Ã³': 'ó', 'Ãº': 'ú',
         'Ã': 'Á', 'Ã': 'É', 'Ã': 'Í', 'Ã': 'Ó', 'Ã': 'Ú',
@@ -41,7 +40,7 @@ def replace_special_chars(texts):
         'ã©':'é', 'ã¡':'á', 'ãº':'ú', 'ã°':'ó', 'ã':'ñ', 'ã':'ü'
     }
 
-    # Reemplazar caracteres especiales en cada texto
+    # Se reemplazan los caracteres especiales en cada texto
     texts_replaced = []
     for text in texts:
         for old, new in replacements.items():
@@ -79,7 +78,7 @@ def normalize_documents(doc):
     doc = ' '.join(filtered_token)
     return doc
 
-# Normalizar un conjunto de documentos
+# Se normaliza cada texto individualmente
 def normalize_corpus(texts):
     return [normalize_documents(text) for text in texts]
 
@@ -87,7 +86,7 @@ def normalize_corpus(texts):
 def preprocess_texts(texts):
     # Se reemplazan los caracteres especiales
     textos_reemplazados = replace_special_chars(texts)
-    # Seaplica normalización y demás procesamiento a los datos
+    # Se aplica normalización y demás procesamiento a los datos
     textos_normalizados = normalize_corpus(textos_reemplazados)
     return textos_normalizados
 
