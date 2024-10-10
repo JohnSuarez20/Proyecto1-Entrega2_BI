@@ -152,7 +152,7 @@ async def predecir(file: UploadFile = File(...)):
         for i in range(len(predicciones)):
             resultado.append({
                 "prediccion": int(predicciones[i]),  
-                "probabilidad": float(max(probabilidades[i])) 
+                "probabilidad": float(max(probabilidades[i]))*100
             })
 
         return {"resultado": resultado}
