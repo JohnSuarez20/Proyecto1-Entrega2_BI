@@ -49,7 +49,8 @@ def replace_special_chars(df):
         for old, new in replacements.items():
             df[col] = df[col].str.replace(old, new)
     return df
-
+#Se envia a un excel los datos que se van a utilizar para el reentrenamiento
+data_t.to_excel('data/ODScat_345_1.xlsx', index=False)
 # Se aplica la función a los datos cargados
 data_t = replace_special_chars(data_t)
 
@@ -163,8 +164,18 @@ async def predecir(file: UploadFile = File(...)):
 @app.post("/reentrenamiento/")
 async def reentrenar(file: UploadFile = File(...)):
     try:
+        #Se carga el archivo de datos utilizado en el último reentrenamiento
+        file_path_p = r"data\ODScat_345_1.xlsx"  
+        try:
+            data_p = pd.read_excel(file_path_p, engine='openpyxl')
+        except:
+            data_p = pd.read_excel(file_path_p, engine='xlrd') 
+
         # Se carga el archivo CSV
-        df = pd.read_csv(file.file, sep=',', encoding = "ISO-8859-1")
+        df1 = pd.read_csv(file.file, sep=',', encoding = "ISO-8859-1")
+        #Se concatena el archivo cargado con datos nuevos con el archivo de datos utilizado en la Etapa1 para el reentrenamiento
+        df= pd.concat([data_p, df1], ignore_index=True)
+        df.to_excel('data/ODScat_345_1.xlsx', index=False)
         textos = df['Textos_espanol'].tolist()
         etiquetas = df['sdg'].tolist()
 
