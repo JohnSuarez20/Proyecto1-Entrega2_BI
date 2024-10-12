@@ -160,6 +160,7 @@ async def predecir(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # Endpoint de reentrenamiento con cargue de archivo CSV
 @app.post("/reentrenamiento/")
 async def reentrenar(file: UploadFile = File(...)):
@@ -203,9 +204,8 @@ async def reentrenar(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 # Se ejecuta la api
-if __name__ == "__main__":
+if __name__ =="__main__":
     uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
-
 
 #COMANDOS PARA EJECUTAR EL PROYECTO
 
