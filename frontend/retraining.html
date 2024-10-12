@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reentrenamiento del Modelo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        nav {
+            margin-bottom: 20px; /* Espacio entre el menú y el contenido */
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline; /* Mostrar los elementos de la lista en línea */
+            margin-right: 20px; /* Espacio entre los elementos del menú */
+        }
+
+        nav ul li a {
+            text-decoration: none; /* Sin subrayado */
+            color: #fff; /* Color del texto */
+            background-color: #add8e6; /* Azul bebé */
+            padding: 10px 15px; /* Espaciado interno */
+            border-radius: 5px; /* Bordes redondeados */
+        }
+
+        nav ul li a:hover {
+            background-color: #90c0d0; /* Color al pasar el mouse */
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px; /* Espacio entre formularios */
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        .btn {
+            background-color: #add8e6; /* Azul bebé */
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #90c0d0; /* Un tono más oscuro al pasar el mouse */
+        }
+
+        .metrics {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Reentrenamiento del Modelo - ODS</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="prediction.html">Predicción</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section>
+                <h2>Reentrenamiento del Modelo</h2>
+                <p>Sube un archivo CSV con los nuevos datos (columna de textos: "Textos_espanol", columna de etiquetas: "sdg"):</p>
+                <div class="form-group">
+                    <input type="file" id="retrain-file" accept=".csv">
+                </div>
+                <button class="btn" onclick="retrainModel()">Reentrenar</button>
+
+                <h2>Resultado del Reentrenamiento</h2>
+                <div class="metrics">
+                    <p>Exactitud: <span id="exactitud"></span></p>
+                    <p>Precisión: <span id="precision"></span></p>
+                    <p>Recall: <span id="recall"></span></p>
+                    <p>F1-Score: <span id="f1score"></span></p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Proyecto ODS. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+    <script src="retraining.js"></script>
+</body>
+</html>

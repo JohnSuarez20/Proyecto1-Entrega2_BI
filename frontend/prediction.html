@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción de Textos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        nav {
+            margin-bottom: 20px; /* Espacio entre el menú y el contenido */
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline; /* Mostrar los elementos de la lista en línea */
+            margin-right: 20px; /* Espacio entre los elementos del menú */
+        }
+
+        nav ul li a {
+            text-decoration: none; /* Sin subrayado */
+            color: #fff; /* Color del texto */
+            background-color: #add8e6; /* Azul bebé */
+            padding: 10px 15px; /* Espaciado interno */
+            border-radius: 5px; /* Bordes redondeados */
+        }
+
+        nav ul li a:hover {
+            background-color: #90c0d0; /* Color al pasar el mouse */
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px; /* Espacio entre formularios */
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            background-color: #add8e6; /* Azul bebé */
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #90c0d0; /* Un tono más oscuro al pasar el mouse */
+        }
+
+        #predictions {
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f0f8ff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e0f7fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Predicción de Textos</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="prediction.html">Predicción</a></li>
+                    <li><a href="retraining.html">Reentrenamiento</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Formulario para cargar el archivo CSV -->
+        <div class="form-group">
+            <h2>Cargar CSV para predicción</h2>
+            <input type="file" id="fileInput" accept=".csv">
+            <button id="predictBtn" class="btn">Predecir</button>
+            <div id="predictions">
+                <table id="predictionsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th># Texto</th>
+                            <th>ODS (Predicción)</th>
+                            <th>Probabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predictBtn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                alert('Por favor, selecciona un archivo CSV.');
+                return;
+            }
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/prediccion/', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de la API');
+                }
+
+                const data = await response.json();
+                const predictionsTableBody = document.getElementById('predictionsTable').querySelector('tbody');
+                predictionsTableBody.innerHTML = ''; // Limpiar el contenido anterior
+                data.resultado.forEach((result, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>Texto ${index + 1}</td><td>${result.prediccion}</td><td>${result.probabilidad.toFixed(2)}%</td>`;
+                    predictionsTableBody.appendChild(row);
+                });
+
+                const predictionsTable = document.getElementById('predictionsTable');
+                predictionsTable.style.display = 'table'; // Mostrar la tabla
+            } catch (error) {
+                console.error(error);
+                alert('Ocurrió un error durante la predicción.');
+            }
+        });
+    </script>
+</body>
+</html>
