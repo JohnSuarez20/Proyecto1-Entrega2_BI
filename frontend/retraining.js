@@ -19,7 +19,7 @@ function retrainModel() {
         document.getElementById('exactitud').innerText = data.exactitud;
         document.getElementById('precision').innerText = data.precision;
         document.getElementById('recall').innerText = data.recall;
-        document.getElementById('f1score').innerText = data.f1score;
+        document.getElementById('f1_score').innerText = data.f1_score;
     })
     .catch(error => {
         console.error('Error en el reentrenamiento:', error);
